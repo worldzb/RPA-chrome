@@ -29,7 +29,7 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
 
   state: AiTabAppState = {
     anthropicAPIKey: '',
-    prompt: 'Explain a random Ui.Vision command', 
+    prompt: '解释一个随机的 AI RPA 命令',
     promptResponse: '',
     error: ''
   }
@@ -66,17 +66,17 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
     return (
       <div className="ai-tab">
         <div className="row" style={{ marginBottom: '20px' }}>
-          The AI commands feature is currently experimental/beta. It uses the Anthropic API. To enable the AI commands, please enter your
-          (free) Anthropic API key below{' '}
+          AI 命令功能目前处于实验 / 测试阶段。它使用 Anthropic API。要启用 AI 命令，请在下方输入你的
+          Anthropic API Key（可免费申请）{' '}
           <a href="https://goto.ui.vision/x/idehelp?help=ai" target="_blank">
             {' '}
-            (more information)
+            （更多信息）
           </a>
           :
         </div>
 
         <div className="ai-settings-item">
-          <span className="label-text">API Key:</span>
+          <span className="label-text">API Key：</span>
           <Input
             type="text"
             value={this.state.anthropicAPIKey}
@@ -89,10 +89,10 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
             onClick={() => {
               if (this.props.config.anthropicAPIKey) {
                 Modal.confirm({
-                  title: 'Confirm',
-                  content: 'Do you want to overwrite the existing API key?',
-                  okText: 'Yes',
-                  cancelText: 'No',
+                  title: '确认',
+                  content: '是否覆盖现有的 API Key？',
+                  okText: '是',
+                  cancelText: '否',
                   onOk: () => {
                     onConfigChange('anthropicAPIKey', this.state.anthropicAPIKey)
                     this.setState({ anthropicAPIKey: '' })
@@ -105,31 +105,31 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
             }}
             // disabled={this.state.anthropicAPIKey == this.props.config.anthropicAPIKey}
           >
-            Save
+            保存
           </Button>
         </div>
         <div className="ai-settings-item">
-          <span className="label-text">Prompt:</span>
+          <span className="label-text">提示词：</span>
           <Input
             type="text"
-            value={this.state.prompt || 'Hello Claude'} //is this text used anywhere?
+            value={this.state.prompt || '你好，Claude'} //is this text used anywhere?
             onChange={(e) => {
               this.setState({ prompt: e.target.value })
             }}
           />
           <Button type="primary" onClick={this.onClickTestPrompt}>
-            Test
+            测试
           </Button>
         </div>
         <div className="row" style={{ marginBottom: '10px' }}>
-          Anthropic API (Claude) Answer:
+          Anthropic API（Claude）返回结果：
         </div>
         <div className="ai-response">
           <pre>{this.state.promptResponse}</pre>
         </div>
         <div className="ai-settings-item">
           <span className="label-text">
-            <strong>aiComputerUse:</strong> Max loops before stopping:{' '}
+            <strong>aiComputerUse：</strong> 停止前的最大循环次数：{' '}
           </span>
           <Input
             type="number"
@@ -148,11 +148,11 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
             }}
             checked={this.props.config.useInitialPromptInAiChat}
           >
-            AI Chat in sidebar. Use initial prompt.
+            在侧边栏中启用 AI 对话，并使用初始提示词。
           </Checkbox>
           <Input
             type="text"
-            value={this.props.config.aiChatSidebarPrompt || 'Describe what you see, in 10 words or less.'} 
+            value={this.props.config.aiChatSidebarPrompt || '请用不超过 10 个词描述你看到的内容。'}
             onChange={(e) => {
               onConfigChange('aiChatSidebarPrompt', e.target.value)
             }}

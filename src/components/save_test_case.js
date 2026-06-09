@@ -24,9 +24,9 @@ class SaveAsModal extends React.Component {
   render () {
     return (
       <Modal
-        title="Save macro as.."
-        okText="Save"
-        cancelText="Cancel"
+        title="宏另存为..."
+        okText="保存"
+        cancelText="取消"
         open={true}
         onOk={() => this.props.onOk(this.state.name)}
         onCancel={this.props.onCancel}
@@ -37,7 +37,7 @@ class SaveAsModal extends React.Component {
           onKeyDown={e => { e.keyCode === 13 && this.props.onOk(this.state.name) }}
           onChange={e => this.setState({ name: e.target.value })}
           value={this.state.name || ''}
-          placeholder="macro name"
+          placeholder="宏名称"
           ref={el => { this.inputSaveTestCase = el }}
         />
       </Modal>
@@ -77,7 +77,7 @@ const tryToSave = (store, testCaseName) => {
       return store.dispatch(saveEditingAsNew(name))
       .then(
         () => {
-          message.success('successfully saved!', 1.5)
+          message.success('保存成功！', 1.5)
           resolve(true)
         },
         e  => {
@@ -125,10 +125,10 @@ const factory = (store) => {
       const hasUnsaved  = hasUnsavedMacro(state)
       const isExisting  = !!state.editor.editing.meta.src
       const opts        = {
-        getTitle:   (data) => `Unsaved changes in macro "${data.macroName}"`,
-        getContent: (data) => 'Do you want to discard or save these changes?',
-        okText:     'Save',
-        cancelText: 'Discard',
+        getTitle:   (data) => `宏“${data.macroName}”有未保存更改`,
+        getContent: (data) => '要放弃这些更改，还是先保存？',
+        okText:     '保存',
+        cancelText: '放弃',
         ...(options || {})
       }
 

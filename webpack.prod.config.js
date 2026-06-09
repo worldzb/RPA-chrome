@@ -32,19 +32,9 @@ module.exports = {
     filename: '[name].js'
   },
   optimization: {
-    minimizer: [],
-    splitChunks: {
-      automaticNameDelimiter: '_',
-      chunks: chunk => ['content_script', 'inject', 'bg'].indexOf(chunk.name) === -1,
-      cacheGroups: {
-        reactVendors: {
-          name: 'react-essentials',
-          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-          priority: -10
-        }
-      }
-    }
+    minimizer: []
   },
+  recordsPath: path.join(__dirname, '.webpack-records.json'),
   module: {
     rules: [
       {
@@ -103,16 +93,32 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js', '.json'],
     alias: {
       '@': path.join(__dirname, 'src'),
-      '$': __dirname
+      '$': __dirname,
+      'node:stream/promises': false,
+      'stream/promises': false,
+      'node:stream': require.resolve('stream-browserify'),
+      'node:path': require.resolve('path-browserify'),
+      'node:util': require.resolve('util/')
     },
     fallback: {
       buffer: require.resolve('buffer'),
       stream: require.resolve('stream-browserify'),
+      path: require.resolve('path-browserify'),
+      util: require.resolve('util/'),
+      fs: false,
+      'fs/promises': false,
+      crypto: false,
+      child_process: false,
+      readline: false,
+      'stream/promises': false,
       'process/browser': require.resolve('process/browser')
     }
   },
   plugins: [
     // new BundleAnalyzerPlugin(), // uncomment and run build to see bundle size
+    new webpack.NormalModuleReplacementPlugin(/^node:/, function(resource) {
+      resource.request = resource.request.replace(/^node:/, '')
+    }),
     new webpack.ProvidePlugin({
       process: 'process/browser'
     }),

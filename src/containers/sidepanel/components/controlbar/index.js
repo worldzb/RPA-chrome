@@ -36,7 +36,7 @@ class Controls extends React.Component {
 
   getTestCaseName = () => {
     const { src } = this.props.editing.meta
-    return src && src.name && src.name.length ? src.name : 'Untitled'
+    return src && src.name && src.name.length ? src.name : '未命名'
   }
 
   getPlayer = (name) => {
@@ -126,7 +126,7 @@ class Controls extends React.Component {
   onClickOpenIDE = async (showSettingsOnStart = false) => {
 
     if(Ext.isFirefox()) {
-      const userResponse = confirm('To Open IDE, click OK and click the Extension icon in extension bar.')
+      const userResponse = confirm('要打开 IDE，请先点击“确定”，再点击扩展栏中的扩展图标。')
       if (!userResponse) return  
 
       await this.props.updateConfig({ ["oneTimeShowSidePanel"]: false })
@@ -190,28 +190,28 @@ class Controls extends React.Component {
           <div className='action-button-container'>
             <Button disabled={this.props.player.status === C.PLAYER_STATUS.PLAYING || this.props.player.status === C.PLAYER_STATUS.PAUSED } onClick={() => this.playCurrentMacro(false)} >
               <FontAwesomeIcon icon={faCirclePlay} />
-              <span> Play</span> 
+              <span> 播放</span>
             </Button>
             {this.props.player.status === C.PLAYER_STATUS.PAUSED ? (
               <Button onClick={() => this.getPlayer().resume()}>
                 <FontAwesomeIcon icon={faCirclePlay} />
-                <span> Resume</span>              
+                <span> 继续</span>
               </Button>
             ) : (
               <Button disabled={this.props.player.status !== C.PLAYER_STATUS.PLAYING} onClick={() => this.getPlayer().pause()}>
                 <FontAwesomeIcon icon={faCirclePause} />
-                <span> Pause</span>
+                <span> 暂停</span>
               </Button>
             )}
             <Button disabled={this.props.player.status === C.PLAYER_STATUS.STOPPED} onClick={() => this.getPlayer().stop()}>
               <FontAwesomeIcon icon={faCircleStop} />
-              <span> Stop</span>
+              <span> 停止</span>
             </Button>
           </div>
           <div className='action-button-container'>
             <Button disabled={this.props.player.status === C.PLAYER_STATUS.PLAYING || this.state.openIDEClicked} onClick={() => this.onClickOpenIDE()}>
               <FontAwesomeIcon icon={faPenToSquare} />
-              <span> Open IDE</span>
+              <span> 打开 IDE</span>
             </Button>
             <Button disabled={this.props.player.status === C.PLAYER_STATUS.PLAYING} onClick={() => this.onClickOpenIDE(true)} shape="circle" >
               <SettingOutlined />
@@ -220,7 +220,7 @@ class Controls extends React.Component {
           <div className='action-button-container'>
             <a onClick={() => {
               chrome.tabs.create({url: "https://goto.ui.vision/x/idehelp?help=sidepanel"})
-            }}>Ui.Vision Side Panel</a>
+            }}>AI RPA 侧边栏</a>
           </div>
         </div>
       </div>

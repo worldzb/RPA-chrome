@@ -53,7 +53,7 @@ class Files extends React.Component {
   onClickRename = () => {
     this.props.renameTestCase(this.state.rename, this.state.renameTcId)
       .then(() => {
-        message.success('successfully renamed!', 1.5)
+        message.success('重命名成功！', 1.5)
         this.toggleRenameModal(false)
       })
       .catch((e) => {
@@ -120,7 +120,7 @@ class Files extends React.Component {
         const openTc  = commands.find(item => item.cmd.toLowerCase() === 'open')
         const { src } = this.props.editing.meta
         const getMacroName = () => {
-          return src && src.name && src.name.length ? src.name : 'Untitled'
+          return src && src.name && src.name.length ? src.name : '未命名'
         }
         const getMacroId = () => {
           return src ? src.id : C.UNTITLED_ID
@@ -234,13 +234,13 @@ class Files extends React.Component {
     const { filteredMacroFileNodeData } = this.props
 
     if (this.props.isLoadingMacros && this.props.isMacroFolderNodeListEmpty) {
-      return <div className="no-data">Loading macros...</div>
+      return <div className="no-data">正在加载宏...</div>
     }
 
     return (
       <div className="sidebar-macros">
         {filteredMacroFileNodeData.length === 0 ? (
-          <div className="no-data">No macro found</div>
+          <div className="no-data">未找到宏</div>
         ) : null}
         <FileTree
           nodes={filteredMacroFileNodeData}

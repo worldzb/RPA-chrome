@@ -135,12 +135,12 @@ class AiChat extends React.Component<AiChatStateProps, AiChatState> {
         console.log('#220 getTerminationRequest:>> loopCompletedCount:>> ', loopCompletedCount)
         console.log('#220 getTerminationRequest:>> maxLoop:>> ', maxLoop)
         if (loopCompletedCount >= maxLoop) {
-          this.addConversation('Action', `Computer Use sequence ended (${loopCompletedCount} loops)`)
+          this.addConversation('Action', `计算机操作流程已结束（共 ${loopCompletedCount} 轮）`)
           return 'max_loop_reached'
         }
 
         if (this.state.processRunning === false) {
-          this.addConversation('Action', `Computer Use sequence ended (${loopCompletedCount} loops)`)
+          this.addConversation('Action', `计算机操作流程已结束（共 ${loopCompletedCount} 轮）`)
           return 'stop_requested'
         }
       }
@@ -257,7 +257,7 @@ class AiChat extends React.Component<AiChatStateProps, AiChatState> {
     // console.log('#238 find:>> coordinates:>> ', coordinates)
 
     if(!this.state.latestMouseCoordinate) {
-      this.props.renderStatus('No coordinates found')
+      this.props.renderStatus('未找到坐标')
       return;
     }
 

@@ -1,10 +1,10 @@
 {
   "name": {
-    "message": "Ui.Vision",
+    "message": "AI RPA",
     "description": "extension name"
   },
   "description": {
-    "message": "Task and UI test automation with Computer Vision/OCR. Ui.Vision combines browser automation and desktop automation.",
+    "message": "Task and UI test automation with Computer Vision/OCR. AI RPA combines browser automation and desktop automation.",
     "description": "extension description"
   },
   "short_name": {

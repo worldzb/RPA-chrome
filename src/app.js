@@ -115,15 +115,15 @@ class App extends Component {
       <Modal
         className="preinstall-modal"
         open={true}
-        title="New demo macros available"
-        okText="Yes, overwrite"
-        cancelText="Skip"
+        title="发现新的演示宏"
+        okText="是，覆盖"
+        cancelText="跳过"
         onOk={() => {
           this.props.updateUI({ newPreinstallVersion: false })
 
           return this.props.preinstall(true)
           .then(() => {
-            message.success('demo macros updated')
+            message.success('演示宏已更新')
           })
           .catch(e => {
             message.error(e.message)
@@ -134,7 +134,7 @@ class App extends Component {
           this.props.preinstall(false)
         }}
       >
-        <p style={{ fontSize: '14px' }}>Do you want to overwrite the demo macros with their latest versions?</p>
+        <p style={{ fontSize: '14px' }}>是否用最新版本覆盖演示宏？</p>
       </Modal>
     )
   }
@@ -154,16 +154,16 @@ class App extends Component {
       return (
         <div className="app no-display">
           <div className="content">
-            <div className="status">UI.Vision is in "No Display" mode now</div>
+            <div className="status">AI RPA 当前处于“无界面显示”模式</div>
             <Button.Group className="simple-actions">
               <Button size="large" onClick={() => this.getPlayer().stop()}>
-                <span>Stop</span>
+                <span>停止</span>
               </Button>
                 <Button
                   size="large"
                   onClick={this.showGUI}
                 >
-                  <span>Show GUI</span>
+                  <span>显示界面</span>
                 </Button>
             </Button.Group>
           </div>
@@ -174,10 +174,10 @@ class App extends Component {
     return (
       <div className="app with-sidebar" ref={el => { this.$app = el }}>
         <div className="backup-alert">
-          <span>Do you want to run the automated backup?</span>
+          <span>是否立即运行自动备份？</span>
           <span className="backup-actions">
-            <Button type="primary" onClick={this.onClickBackup}>Yes</Button>
-            <Button onClick={this.onClickNoBackup}>No</Button>
+            <Button type="primary" onClick={this.onClickBackup}>是</Button>
+            <Button onClick={this.onClickNoBackup}>否</Button>
           </span>
         </div>
         <div className="app-inner">
@@ -196,16 +196,16 @@ class App extends Component {
         {this.props.ocrInDesktopMode ? (
           <div className="app no-display ocr-overlay">
             <div className="content">
-              <div className="status">Desktop OCR in progress</div>
+              <div className="status">桌面 OCR 进行中</div>
               <Button.Group className="simple-actions">
                 <Button size="large" onClick={() => this.getPlayer().stop()}>
-                  <span>Stop</span>
+                  <span>停止</span>
                 </Button>
                 <Button
                   size="large"
                   onClick={() => this.showGUIForOCR()}
                 >
-                  <span>Show GUI</span>
+                  <span>显示界面</span>
                 </Button>
               </Button.Group>
             </div>

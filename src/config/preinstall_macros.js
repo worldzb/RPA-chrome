@@ -277,7 +277,7 @@ export default {
     },
     {
       "Command": "aiComputerUse",
-      "Target": "Automate the Ui.Vision IDE. \n\nFind and press the Clear button. \n\nTo save time, do not use mouse move. Only do CLICK.\n\nTry only once. It is successful, if log tab is less than half full by the time you take a screenshot.\n\nEnd with SUCCESS, or ERROR if problems occur.",
+      "Target": "自动操作 AI RPA。\n\n找到并点击 Clear 按钮。\n\n为节省时间，不要移动鼠标，只执行点击。\n\n只尝试一次。如果截图时日志标签页内容不到一半，则视为成功。\n\n最后输出 SUCCESS；如果出现问题则输出 ERROR。",
       "Value": "s",
       "Description": ""
     },
@@ -502,7 +502,7 @@ export default {
     },
     {
       "Command": "aiScreenXY",
-      "Target": "Look for the Ui.Vision IDE. In it, find the Logs tab.",
+      "Target": "找到 AI RPA，并在其中定位 Logs 标签页。",
       "Value": "s",
       "Description": ""
     },
@@ -522,17 +522,17 @@ export default {
       "Command": "XClick",
       "Target": "${!ai1},${!ai2}",
       "Value": "",
-      "Description": "Click on Logs tab. Goal is to select it if it is not selected. Then the Clear button appears. We need this button for the next step."
+      "Description": "点击 Logs 标签页。如果它尚未选中，则将其选中。随后会出现 Clear 按钮，下一步需要用到它。"
     },
     {
       "Command": "echo",
-      "Target": "Logs tab selected",
+      "Target": "已选中 Logs 标签页",
       "Value": "green",
       "Description": ""
     },
     {
       "Command": "aiScreenXY",
-      "Target": "Look for the Ui.Vision IDE. In it, find the Clear button",
+      "Target": "找到 AI RPA，并在其中定位 Clear 按钮",
       "Value": "s",
       "Description": ""
     },
@@ -587,7 +587,7 @@ export default {
       },
       {
         "Command": "click",
-        "Target": "//span[contains(text(),\"UI.Vision IDE\")]",
+        "Target": "//span[contains(text(),\"AI RPA\")]",
         "Value": ""
       },
       {
@@ -1272,7 +1272,7 @@ export default {
       },
       {
         "Command": "click",
-        "Target": "//span[contains(text(),\"UI.Vision IDE\")]",
+        "Target": "//span[contains(text(),\"AI RPA\")]",
         "Value": "",
         "Description": ""
       },
@@ -1650,7 +1650,7 @@ export default {
       },
       {
         "Command": "click",
-        "Target": "//span[contains(text(),\"UI.Vision IDE\")]",
+        "Target": "//span[contains(text(),\"AI RPA\")]",
         "Value": "",
         "Description": ""
       },

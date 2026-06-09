@@ -351,10 +351,10 @@ class Header extends React.Component {
           (permissionGranted) => {
             if (!permissionGranted) { 
               Modal.confirm({
-                title: "Grant Permission To Replay Macros",
-                content: `Ui.Vision is an open-source tool for automating tasks. To replay macros, it requires permission from Firefox to 'access data in all tabs'. If you click 'OK', Ui.Vision will open the Firefox permission dialog, allowing you to provide this permission. Continue?`,
-                okText: "Continue",
-                cancelText: "Cancel",
+                title: "授予宏回放权限",
+                content: `AI RPA 是一个用于自动化任务的开源工具。要回放宏，它需要获得 Firefox 的“访问所有标签页数据”权限。点击“确定”后，AI RPA 会打开 Firefox 权限对话框以申请该权限。是否继续？`,
+                okText: "继续",
+                cancelText: "取消",
                 onOk: () => { 
                   Ext.permissions.request({origins: ['<all_urls>']}).then((result) => {
                     console.log('permission result:>>', result)  
@@ -496,14 +496,14 @@ class Header extends React.Component {
 
     if (checkUnregistered(registerKey)) {
       this.props.updateConfig({ xmodulesStatus: "unregistered" });
-      message.success(`Unregistered`);
+      message.success(`未注册`);
       getStorageManager().emit(StorageManagerEvent.RootDirChanged);
       this.resetRegisterKey();
       this.forceUpdate();
       return;
     }
 
-    const notifyLicenseError = () => message.error("Invalid license key");
+    const notifyLicenseError = () => message.error("许可证密钥无效");
 
     if (!checkBasicPattern(registerKey)) {
       return notifyLicenseError();
@@ -521,11 +521,11 @@ class Header extends React.Component {
         this.resetRegisterKey();
         this.forceUpdate();
         getStorageManager().emit(StorageManagerEvent.RootDirChanged);
-        message.success("License key verified");
+        message.success("许可证密钥验证成功");
       })
       .catch((e) => {
         const text = isNetworkError(e)
-          ? "Internet connection required for activation. If you want use the software on a machine without Internet connection, please contact tech support"
+          ? "激活需要联网。如果你想在无法联网的设备上使用该软件，请联系技术支持。"
           : e.message;
 
         message.error(text, 4);
@@ -540,7 +540,7 @@ class Header extends React.Component {
     if (hasUnsaved) {
       // Note: Chrome is showing the default message anyway
       const promptMessage =
-        "You have unsaved Changes. Do you want to save before leaving application?";
+        "你有未保存的更改。离开应用前是否先保存？";
       event.returnValue = promptMessage;
       return promptMessage;
     }
@@ -709,10 +709,10 @@ class Header extends React.Component {
   renderPublicWebsiteWhiteList() {
     return (
       <Modal
-        title="Embedded Macros Website Whitelist"
+        title="嵌入式宏网站白名单"
         className="whitelist-modal"
         width={450}
-        okText="Save"
+        okText="保存"
         open={this.props.ui.showWebsiteWhiteList}
         onCancel={() => this.props.updateUI({ showWebsiteWhiteList: false })}
         onOk={(close) => {
@@ -724,17 +724,16 @@ class Header extends React.Component {
 
           this.props.updateConfig({ websiteWhiteList: lines });
           this.props.updateUI({ showWebsiteWhiteList: false });
-          message.success("Saved");
+          message.success("已保存");
 
           return Promise.resolve(true);
         }}
       >
         <p style={{ marginBottom: "10px" }}>
-          Allow embedded macros to run <em>without warning dialog</em>, if
-          started from the following sites:
+          如果嵌入式宏从以下网站启动，则允许其在<em>不弹出警告对话框</em>的情况下运行：
         </p>
         <Input.TextArea
-          placeholder="One url per line, e. g. https://ui.vision/rpa"
+          placeholder="每行一个 URL，例如：https://ui.vision/rpa"
           autosize={{ minRows: 6, maxRows: 12 }}
           value={this.state.websiteWhiteListText}
           style={{ resize: "vertical" }}
@@ -748,9 +747,9 @@ class Header extends React.Component {
             href="https://goto.ui.vision/x/idehelp?help=website_whitelist"
             target="_blank"
           >
-            More info
+            更多信息
           </a>
-          Only run embedded macros from websites you trust
+          只运行来自可信网站的嵌入式宏
         </p>
       </Modal>
     );
@@ -759,9 +758,9 @@ class Header extends React.Component {
   renderPlayLoopModal() {
     return (
       <Modal
-        title="How many loops to play?"
-        okText="Play"
-        cancelText="Cancel"
+        title="要播放多少次循环？"
+        okText="播放"
+        cancelText="取消"
         className="play-loop-modal"
         open={this.state.showPlayLoops}
         onOk={this.onClickPlayLoops}
@@ -769,7 +768,7 @@ class Header extends React.Component {
       >
         <Row>
           <Col span={10}>
-            <Form.Item label="Start value">
+            <Form.Item label="起始值">
               <Input
                 type="number"
                 min="0"
@@ -784,7 +783,7 @@ class Header extends React.Component {
             </Form.Item>
           </Col>
           <Col span={10} offset={2}>
-            <Form.Item label="Max">
+            <Form.Item label="最大值">
               <Input
                 type="number"
                 min="0"
@@ -801,8 +800,7 @@ class Header extends React.Component {
         </Row>
 
         <p>
-          The value of the loop counter is available in ${"{"}!LOOP{"}"}{" "}
-          variable
+          循环计数器的值可通过变量 ${"{"}!LOOP{"}"} 访问
         </p>
       </Modal>
     );
@@ -811,7 +809,7 @@ class Header extends React.Component {
   renderSettingOfflineModal() {
     return (
       <Modal
-        title="Eneterprise OCR Server"
+        title="企业版 OCR 服务器"
         className="settings-modal"
         width={650}
         footer={null}
@@ -831,17 +829,17 @@ class Header extends React.Component {
               disabled={!getLicenseService().isProLicense()}
               className={cn({ "need-pro": !getLicenseService().isProLicense() })}
             >
-              Use{" "}
+              使用{" "}
               <a
                 href="https://goto.ui.vision/x/idehelp?help=ocrenterprise"
                 target="_blank"
               >
-                Local Enterprise OCR Server
+                本地企业版 OCR 服务器
               </a>{" "}
-              (Requires XModules Enterprise Edition)
+              （需要 XModules 企业版）
               <br />
               <div className="row offline-modal-row">
-                <span className="offline-modal-label">Local OCR</span>
+                <span className="offline-modal-label">本地 OCR</span>
                 <Input
                   type="text"
                   style={{ width: "200px" }}
@@ -852,7 +850,7 @@ class Header extends React.Component {
                   }
                 />
                 <br />
-                <span className="offline-modal-label">Local API key</span>
+                <span className="offline-modal-label">本地 API Key</span>
                 <Input
                   type="password"
                   style={{ width: "200px" }}
@@ -1007,7 +1005,7 @@ class Header extends React.Component {
 
     return (
       <Modal
-        title="Settings"
+        title="设置"
         className="settings-modal"
         width={700}
         footer={null}
@@ -1030,10 +1028,10 @@ class Header extends React.Component {
           items={[
             {
               key: "replay",
-              label: "Replay",
+              label: "回放",
               children: (
                 <Form>
-                  <Form.Item label="Replay Helper" {...displayConfig}>
+                  <Form.Item label="回放辅助" {...displayConfig}>
                     <Checkbox
                       onClick={(e) =>
                         onConfigChange(
@@ -1043,7 +1041,7 @@ class Header extends React.Component {
                       }
                       checked={this.props.config.playScrollElementsIntoView}
                     >
-                      Scroll elements into view during replay
+                      回放时将元素滚动到可视区域
                     </Checkbox>
 
                     <Checkbox
@@ -1055,7 +1053,7 @@ class Header extends React.Component {
                       }
                       checked={this.props.config.playHighlightElements}
                     >
-                      Highlight elements during replay
+                      回放时高亮元素
                     </Checkbox>
                   </Form.Item>
 
@@ -1065,7 +1063,7 @@ class Header extends React.Component {
                         target="_blank"
                         href="https://goto.ui.vision/x/idehelp?help=command_interval"
                       >
-                        Command Interval
+                        命令间隔
                       </a>
                     }
                     {...displayConfig}
@@ -1078,11 +1076,11 @@ class Header extends React.Component {
                         onConfigChange("playCommandInterval", val)
                       }
                     >
-                      <Select.Option value={"0"}>Fast (no delay)</Select.Option>
+                      <Select.Option value={"0"}>快速（无延迟）</Select.Option>
                       <Select.Option value={"0.3"}>
-                        Medium (0.3s delay)
+                        中速（延迟 0.3 秒）
                       </Select.Option>
-                      <Select.Option value={"2"}>Slow (2s delay)</Select.Option>
+                      <Select.Option value={"2"}>慢速（延迟 2 秒）</Select.Option>
                     </Select>
                   </Form.Item>
 
@@ -1105,9 +1103,9 @@ class Header extends React.Component {
                       onChange={(e) =>
                         onConfigChange("timeoutPageLoad", e.target.value)
                       }
-                      placeholder="in seconds"
+                      placeholder="单位：秒"
                     />
-                    <span className="tip">Max. time for new page load</span>
+                    <span className="tip">新页面加载的最长等待时间</span>
                   </Form.Item>
 
                   <Form.Item
@@ -1129,9 +1127,9 @@ class Header extends React.Component {
                       onChange={(e) =>
                         onConfigChange("timeoutElement", e.target.value)
                       }
-                      placeholder="in seconds"
+                      placeholder="单位：秒"
                     />
-                    <span className="tip">Max. time per step</span>
+                    <span className="tip">每一步的最长等待时间</span>
                   </Form.Item>
                   <Form.Item
                     label={
@@ -1153,9 +1151,9 @@ class Header extends React.Component {
                       onChange={(e) =>
                         onConfigChange("timeoutMacro", e.target.value)
                       }
-                      placeholder="in seconds"
+                      placeholder="单位：秒"
                     />
-                    <span className="tip">Max. overall macro runtime</span>
+                    <span className="tip">宏整体运行的最长时间</span>
                   </Form.Item>
                   <Form.Item
                     label={
@@ -1177,30 +1175,30 @@ class Header extends React.Component {
                       onChange={(e) =>
                         onConfigChange("timeoutDownload", e.target.value)
                       }
-                      placeholder="in seconds"
+                      placeholder="单位：秒"
                     />
-                    <span className="tip">Max. allowed time for file</span>
+                    <span className="tip">文件下载允许的最长时间</span>
                   </Form.Item>
-                  <Form.Item label="If error happens in loop" {...displayConfig}>
+                  <Form.Item label="循环中出错时" {...displayConfig}>
                     <Radio.Group                      
                       value={this.props.config.onErrorInLoop}
                     >
                       <Radio onClick={(e) =>
                         onConfigChange("onErrorInLoop", 'continue_next_loop')
-                      } value="continue_next_loop">Continue next loop</Radio>
+                      } value="continue_next_loop">继续下一轮循环</Radio>
                       <Radio onClick={(e) =>
                         onConfigChange("onErrorInLoop", 'stop')
-                      } value="stop">Stop</Radio>
+                      } value="stop">停止</Radio>
                     </Radio.Group>
                   </Form.Item>
-                  <Form.Item label="Ui.Vision Side Panel" {...displayConfig}>
+                  <Form.Item label="AI RPA 侧边栏" {...displayConfig}>
                     <Checkbox
                       onClick={(e) => {
                         onConfigChange("showSidePanel", !e.target.checked);
                       }}
                       checked={this.props.config.showSidePanel}
                     >
-                      Open Side Panel by default
+                      默认打开侧边栏
                     </Checkbox>
                     <Checkbox
                       onClick={(e) => {
@@ -1208,7 +1206,7 @@ class Header extends React.Component {
                       }}
                       checked={this.props.config.sidePanelOnLeft}
                     >
-                      Check if Side Panel is on the left (
+                      若侧边栏位于左侧请勾选（
                       <a
                         onClick={(e) => {
                           e.preventDefault();
@@ -1218,12 +1216,12 @@ class Header extends React.Component {
                           );
                         }}
                       >
-                        More details
+                        更多说明
                       </a>
                       )
                     </Checkbox>
                   </Form.Item>
-                  <Form.Item label="Ui.Vision Color Theme" {...displayConfig}>
+                  <Form.Item label="AI RPA 主题" {...displayConfig}>
                     <Checkbox
                       onClick={(e) => {
                         const useDarkTheme = !e.target.checked;
@@ -1237,7 +1235,7 @@ class Header extends React.Component {
                       checked={this.props.config.useDarkTheme}
                       style={{marginBottom: 0}}
                     >
-                      Use Dark Mode (
+                      使用深色模式（
                       <a
                         onClick={(e) => {
                           e.preventDefault();
@@ -1247,7 +1245,7 @@ class Header extends React.Component {
                           );
                         }}
                       >
-                        Beta - report issues here
+                        测试版 - 在此反馈问题
                       </a>
                       )
                     </Checkbox>

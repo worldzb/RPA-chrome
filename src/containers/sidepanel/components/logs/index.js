@@ -109,8 +109,8 @@ class Logs extends React.Component {
 
       return Promise.all(ps).then(() => this.props.listCSV())
       .then(() => {
-        message.info(`${list.length} csv files imported`)
-        this.props.addLog('info', `${list.length} csv files imported: ${names.join(', ')}`)
+        message.info(`已导入 ${list.length} 个 CSV 文件`)
+        this.props.addLog('info', `已导入 ${list.length} 个 CSV 文件：${names.join(', ')}`)
       })
     })
     .catch(e => {
@@ -124,8 +124,8 @@ class Logs extends React.Component {
     csvStorage.remove(csv.name)
     .then(() => this.props.listCSV())
     .then(() => {
-      message.success(`successfully deleted`)
-      this.props.addLog('info', `${csv.name} deleted`)
+      message.success(`删除成功`)
+      this.props.addLog('info', `${csv.name} 已删除`)
     })
   }
 
@@ -185,8 +185,8 @@ class Logs extends React.Component {
 
     Promise.all(files.map(read))
     .then(fileNames => {
-      message.success(`${fileNames.length} image files imported into Vision tab`)
-      this.props.addLog('info', `${fileNames.length} image files imported: ${fileNames.join(', ')}`)
+      message.success(`已将 ${fileNames.length} 个图像文件导入 Vision 标签页`)
+      this.props.addLog('info', `已导入 ${fileNames.length} 个图像文件：${fileNames.join(', ')}`)
       this.props.listVisions()
     })
     .catch(e => {
@@ -204,7 +204,7 @@ class Logs extends React.Component {
     .getVisionStorage()
     .rename(oldName, ensureExtName('.png', newName))
     .then(() => {
-      message.success('Successfully renamed')
+      message.success('重命名成功')
       this.props.listVisions()
     })
     .catch(e => {
@@ -232,7 +232,7 @@ class Logs extends React.Component {
         .exists(name)
         .then(result => {
           if (result) {
-            message.error(`'${name}' already exists`)
+            message.error(`'${name}' 已存在`)
           }
           return !result
         })
