@@ -36,8 +36,10 @@ export const CS_IPC_TIMEOUT = 4000
 
 export const STATE_STORAGE_KEY = 'background_state'
 
-export const ANTHROPIC = {
-  COMPUTER_USE_MODEL: 'claude-sonnet-4-5-20250929',
-  COMPUTER_USE_TOOL_VERSION: 'computer_20250124',
-  COMPUTER_USE_BETA_FLAG: 'computer-use-2025-01-24'
+export const AI_MODEL = {
+  DEFAULT: 'gpt-5.5'
+} as const
+
+export const OPENAI_COMPUTER_USE_TOOLS = {
+  COMPUTER: 'computer'
 } as const

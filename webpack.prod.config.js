@@ -32,7 +32,9 @@ module.exports = {
     filename: '[name].js'
   },
   optimization: {
-    minimizer: []
+    minimizer: [],
+    splitChunks: false,
+    runtimeChunk: false
   },
   recordsPath: path.join(__dirname, '.webpack-records.json'),
   module: {

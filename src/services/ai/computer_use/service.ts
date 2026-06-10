@@ -4,7 +4,8 @@ import { Player } from '@/common/player'
 import { compose, isWindows } from '@/common/ts_utils'
 import { store } from '@/redux'
 import { NO_ANTHROPIC_API_KEY_ERROR } from '../anthropic'
-import Sampling, { ClaudeSamplingMessage, SamplingError, SamplingParams } from './sampling'
+import { getOpenAIConfig } from '@/common/ai_config'
+import Sampling, { OpenAISamplingMessage, SamplingError, SamplingParams } from './sampling'
 import { ComputerUseMessageType } from './model'
 
 interface ComputerUseServiceParams {
@@ -23,16 +24,16 @@ const uivError = (error: any) => {
     } else if (error.message.includes('invalid x-api-key')) {
       return new Error('Invalid API key. Please re-enter the API key, and save it.')
     }
-    return new Error(`E352: Anthropic API returned error: ${error.message}`)
+    return new Error(`E352: OpenAI-compatible API returned error: ${error.message}`)
   }
-  return new Error(`E352: Anthropic API returned error: ${error.message}`)
+  return new Error(`E352: OpenAI-compatible API returned error: ${error.message}`)
 }
 
 export class ComputerUseService {
   private _logMessage: (message: string, userOrAi?: ComputerUseMessageType, isActionOrResult?: 'action' | 'result') => void
   private currentLoop = 0
   private _getTerminationRequest: (loopCompletedCount: number) => 'max_loop_reached' | 'player_stopped' | 'stop_requested' | undefined
-  private messages: ClaudeSamplingMessage[] = []
+  private messages: OpenAISamplingMessage[] = []
   private sampling: Sampling
 
   constructor(private params: ComputerUseServiceParams) {
@@ -70,10 +71,11 @@ export class ComputerUseService {
   }
 
   private createNewSampling = () => {
-    let anthropicAPIKey = store.getState().config.anthropicAPIKey
+    const aiConfig = getOpenAIConfig(store.getState().config)
     const samplingProps: SamplingParams = {
-      model: C.ANTHROPIC.COMPUTER_USE_MODEL,
-      anthropicAPIKey: anthropicAPIKey,
+      model: aiConfig.model,
+      openaiApiKey: aiConfig.apiKey,
+      openaiBaseUrl: aiConfig.baseURL,
       captureScreenShotFunction: this.params.captureScreenShotFunction,
       handleMouseAction: this.handleMouseAction,
       handleKeyboardAction: this.handleKeyboardAction,
@@ -243,10 +245,9 @@ export class ComputerUseService {
 
   run = async (promptText: string, value: string, vars: any) => {
     try {
-      let anthropicAPIKey = store.getState().config.anthropicAPIKey
-      console.log('anthropicAPIKey :>> ', anthropicAPIKey)
+      const aiConfig = getOpenAIConfig(store.getState().config)
 
-      if (!anthropicAPIKey) {
+      if (!aiConfig.apiKey) {
         throw new Error(NO_ANTHROPIC_API_KEY_ERROR)
       }
 
@@ -255,7 +256,7 @@ export class ComputerUseService {
 
       console.log('Running sampling...')
 
-      this.sampling.setAPIKey(anthropicAPIKey)
+      this.sampling.setAPIKey(aiConfig.apiKey, aiConfig.baseURL)
 
       return this.sampling
         .run(promptText, this.messages)

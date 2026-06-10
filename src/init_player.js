@@ -1527,13 +1527,10 @@ const interpretCsFreeCommands = ({ store, vars, getTcPlayer, getInterpreter, xCm
         return aiPromptGetPromptAndImageArrayBuffers(target).then(({prompt, mainImageBuffer, searchImageBuffer}) => {
 
 
-          let anthropicAPIKey = store.getState().config.anthropicAPIKey;
-          console.log('anthropicAPIKey :>> ', anthropicAPIKey);
-
-          const anthropicService = new AnthropicService(anthropicAPIKey)             
+          const anthropicService = new AnthropicService(store.getState().config)
           const promptText = prompt
 
-          store.dispatch(act.addLog('info', 'Calling Anthropic API'))
+          store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
           const start = Date.now()
 
           // return anthropicService?.readTextInImage(imageBuffer).then((response) => {
@@ -1750,71 +1747,35 @@ const interpretCsFreeCommands = ({ store, vars, getTcPlayer, getInterpreter, xCm
         const promptText = target // `You are using a web browser. All click and move actions must include coordinates. If you need to scroll down the page, use the keyboard e. g. PageDown.`
         try {
           // console.log('Creating Sampling instance...')
-          let anthropicAPIKey = store.getState().config.anthropicAPIKey;
-          console.log('anthropicAPIKey :>> ', anthropicAPIKey);
-
-          const sampling = new Sampling(anthropicAPIKey, C.ANTHROPIC.COMPUTER_USE_MODEL, promptText, 
-            captureScreenShotFunction,  handleMouseAction, handleKeyboardAction,
-            getTerminationRequest, logMessage
-          );
+          const computerUseService = new ComputerUseService({
+            runCsFreeCommands,
+            value: null,
+            captureScreenShotFunction,
+            isDesktop,
+            logMessage,
+            getTerminationRequest
+          })
 
           logMessage('Computer Use sequence start:')
 
           const userPrompt = target
           logMessage(userPrompt, 'user')
-      
-          console.log('Running sampling...')
-          //  const result = await sampling.run('Use the calculator to calculate 5 + 8 and verify the result. Then stop.');
-          //  const result = await sampling.run('You see a web form. Fill out all fields that you see. Use random but realistic data for names and email. Ignore drop downs. Scroll down with keyboard if needed. Submit the page. Then stop.');
-          //  anti spam stops this. good.   const result = await sampling.run('You see a website of a forum. Sign up for a new account. Fill out all fields that you see. Use random but realistic data for names and email. Ignore drop downs. Scroll down with keyboard if needed. Submit the page. Then stop. Skip all MOUSE MOVE commands. Just use CLICK.');
-          //  const result = await sampling.run('You see a website. Look for big firefox icon. If not found, use Page_down to scroll down. Look again. Do this until you found the Firefox or at the end of the page. Then stop.');
-          //  const result = await sampling.run('Look at the desktop and find the Firefox icon. Click it to open Firefox. When Firefox is open, use CTRL+L to jump to the Firefox address bar (this is where the URL is). Then enter https://ui.vision into the address bar. Press Enter to load the website. Verify the website has loaded. Then stop. Always return x y coordinates with the CLICK and MOVE commands.');
-          //  const result = await sampling.run('Type CTRL+L in Ui.Vision syntax. That is ${KEY_CTRL+KEY_L}.Then stop.');
-          //  const result = await sampling.run('All left_click amd move actions must include coordinates. A calculator is open on the desktop. Use it to calculate 5 + 8 and verify the result. Then stop.');
-          // return  sampling.run('You see a website. A tic tac toe game is open. You are Player 1. Play the game and win. Then stop.', getTerminationRequest).then((result) => {
-          return  sampling.run(userPrompt).then((result) => {
-            console.log('Sampling completed. Result:>>', JSON.stringify(result, null, 2))  
 
-            if(result.stopReason === 'max_loop_reached') {
-              throw new Error('E501: Loop Limit Reached. Increase if needed.')
-            } else if (result.stopReason === 'player_stopped') {
-              logMessage(`Computer Use sequence ended (${currentLoop + 1} loops)`)
-              return {
-                byPass: true,
-                log: {
-                  info: 'Player stopped manually.'
-                }
-              }
-            } else {
-
-              const messages = result//.content[0].text
-              const aiMessages = messages.filter((message) => message.role === 'assistant')
-              const aiResponse = aiMessages[aiMessages.length - 1]?.content?.[0]?.text
-
-              // found the target
-              const newVars = (() => {                     
-                vars.set(
-                  {
-                    [value]: aiResponse,
-                  },
-                  true
-                )
-                return {
-                  [value]: aiResponse,
-                }                      
-              })() 
-
-              return compose(
-                )({
-                  vars: newVars,
-                  byPass: true,
-                })
-            }
- 
+          console.log('Running computer use service...')
+          return computerUseService.run(userPrompt, value, vars).then((result) => {
+            return result
           }).catch((error) => {
             console.error('Error in aiComputerUse:', error)
             throw error
           })
+
+          /*
+          const sampling = new Sampling('', '', promptText,
+            captureScreenShotFunction,  handleMouseAction, handleKeyboardAction,
+            getTerminationRequest, logMessage
+          );
+          */
+
        
         } catch (error) {
           console.error('Error in aiComputerUse:', error)
@@ -1854,13 +1815,10 @@ const interpretCsFreeCommands = ({ store, vars, getTcPlayer, getInterpreter, xCm
             
                return getFileBufferFromScreenshotStorage(screenshotFileName).then((imageBuffer) => {
 
-                  let anthropicAPIKey = store.getState().config.anthropicAPIKey;
-                  console.log('anthropicAPIKey :>> ', anthropicAPIKey);
-
-                  const anthropicService = new AnthropicService(anthropicAPIKey)             
+                  const anthropicService = new AnthropicService(store.getState().config)
                   const promptText = target
 
-                  store.dispatch(act.addLog('info', 'Calling Anthropic API'))
+                  store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
                   const start = Date.now()
 
                   // TODO: refactoring code required in regard to scaleFactor / macScaleFactor / window.devicePixelRatio 

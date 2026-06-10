@@ -1,6 +1,6 @@
 /* global PREINSTALL_CSV_LIST PREINSTALL_VISION_LIST */
 
-import React, { lazy } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { HashRouter } from 'react-router-dom'
 import { ConfigProvider, message, LocaleProvider } from 'antd'
@@ -84,8 +84,8 @@ import interceptLog from './common/intercept_log'
 import { createRoot } from 'react-dom/client'
 import { isSidePanelWindow } from './common/utils'
 
-const App = lazy(() => import('./app'));
-const SidepanelApp = lazy(() => import('./sidepanel_app'));
+import App from './app'
+import SidepanelApp from './sidepanel_app'
 
 interceptLog()
 
@@ -226,7 +226,9 @@ const restoreConfig = () => {
         showSidePanel: false,
         useDarkTheme: false,
         sidePanelOnLeft: false,
-        anthropicAPIKey: '',
+        openaiApiKey: '',
+        openaiBaseUrl: 'https://api.openai.com/v1',
+        openaiModel: 'gpt-5.5',
         aiComputerUseMaxLoops: 50,
         useInitialPromptInAiChat: true,
         aiChatSidebarPrompt: 'Describe what you see, in 10 words or less.',

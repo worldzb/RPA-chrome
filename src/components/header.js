@@ -1255,14 +1255,13 @@ class Header extends React.Component {
             },
             {
               key: "api",
-              label: "API",
+              label: "API 接口",
               className: "api-pane",
               children: (
                 <>
                   <p>
-                    The RPA command line API allows you to run macros and test suites
-                    from the command line and to control Ui.Vision from any
-                    scripting or programming language (
+                    RPA 命令行 API 允许你从命令行运行宏和测试套件，
+                    并可通过任意脚本或编程语言控制 AI RPA（
                     <a
                       href="https://goto.ui.vision/x/idehelp?help=cmdline"
                       target="_blank"
@@ -1284,7 +1283,7 @@ class Header extends React.Component {
                         FileSaver.saveAs(blob, `ui.vision.html`, true);
                       }}
                     >
-                      Generate Autostart HTML Page
+                      生成自动启动 HTML 页面
                     </Button>
                   </p>
 
@@ -1296,7 +1295,7 @@ class Header extends React.Component {
                           href="https://goto.ui.vision/x/idehelp?help=cmdline"
                         >
 
-                          Allow Command Line
+                          允许命令行调用
 
                         </a>
                       }
@@ -1309,8 +1308,7 @@ class Header extends React.Component {
                         }
                         checked={this.props.config.allowRunFromBookmark}
                       >
-                        Run macro and test suite shortcuts from Javascript
-                        Bookmarklets
+                        允许通过 Javascript 书签小程序运行宏和测试套件快捷方式
                       </Checkbox>
                       <Checkbox
                         onClick={(e) =>
@@ -1318,7 +1316,7 @@ class Header extends React.Component {
                         }
                         checked={this.props.config.allowRunFromFileSchema}
                       >
-                        Run embedded macros from local files
+                        允许从本地文件运行嵌入式宏
                       </Checkbox>
                       <Checkbox
                         onClick={(e) =>
@@ -1326,7 +1324,7 @@ class Header extends React.Component {
                         }
                         checked={this.props.config.allowRunFromHttpSchema}
                       >
-                        Run embedded macros from public websites
+                        允许从公网网站运行嵌入式宏
                         <a
                           href="#"
                           style={{
@@ -1340,7 +1338,7 @@ class Header extends React.Component {
                             this.props.updateUI({ showWebsiteWhiteList: true });
                           }}
                         >
-                          Edit Whitelist
+                          编辑白名单
                         </a>
                       </Checkbox>
                     </Form.Item>
@@ -1350,25 +1348,25 @@ class Header extends React.Component {
             },
             {
               key: 'ocr',
-              label: 'OCR',
+              label: 'OCR 识别',
               className: ocrClassName,
               children: (
                 <>
                   <div >
                     <p>
                       <span className="label-text">
-                        Select Default OCR Engine
+                        选择默认 OCR 引擎
                       </span>
                     </p>
                   </div>
                   <div >
-                    <span className="label-text">Local OCR Options: 
+                    <span className="label-text">本地 OCR 选项：
 					{'  ['}
                         <a
                           href="https://goto.ui.vision/x/idehelp?help=ocr-local"
                           target="_blank"
                         >
-                          more info
+                          更多信息
                         </a>
                         {']'}
 					</span>
@@ -1380,26 +1378,26 @@ class Header extends React.Component {
                     >
                       
                       <Radio value="98" onClick={() => onChangeDefaultOCREngine("98")}>
-                        Javascript OCR (Works well for many use cases, additional OCR languages available on 			 
+                        Javascript OCR（适用于许多场景，更多 OCR 语言可在
 						 	<a
                           href="https://goto.ui.vision/x/idehelp?help=ocr-request"
                           target="_blank"
-                        > request</a>)
+                        >此处申请</a>）
                       </Radio>
 
                       <Radio value="99" onClick={() => onChangeDefaultOCREngine("99")}>
-                        XModule Local OCR (Faster/better, especially for text on images)
+                        XModule 本地 OCR（更快、更准确，尤其适合识别图像中的文字）
                       </Radio>
                       
                     </Radio.Group>
                   </div>
                   <div className="row">
-                    <span className="label-text">Use Ocr.Space Online OCR:
+                    <span className="label-text">使用 Ocr.Space 在线 OCR：
 					{'   ['}
 					<a
                           href="https://goto.ui.vision/x/idehelp?help=free-ocr-api"
                           target="_blank"
-                        >Free OCR API account required</a>{']'}
+                        >需要免费 OCR API 账号</a>{']'}
 					</span>
                     <br/>
                     <Radio.Group
@@ -1408,14 +1406,14 @@ class Header extends React.Component {
                       value={"" + this.props.config.ocrEngine}
                     >
                       <Radio value="1" onClick={() => onChangeDefaultOCREngine("1")}>
-                        Cloud OCR: OCR.Space, Engine1 
+                        云端 OCR：OCR.Space，Engine1
                       </Radio>
                       <Radio value="2" onClick={() => onChangeDefaultOCREngine("2")}>
-                        Cloud OCR: OCR.Space, Engine2 
+                        云端 OCR：OCR.Space，Engine2
                       </Radio>
                     </Radio.Group>
                     <div>
-                      <span className="label-text">OCR.Space OCR API Key:</span>
+                      <span className="label-text">OCR.Space OCR API Key：</span>
                       <Input
                         type="text"
                         style={{ width: "120px" }}
@@ -1435,7 +1433,7 @@ class Header extends React.Component {
                            // connect to endpoint
                           let key = this.state.userEnteredOCRAPIKey?.trim();
                           if (!key) {
-                            message.error("Please enter a valid API key");
+                            message.error("请输入有效的 API Key");
                             return;
                           }
                           const isFreeApiKey = isOcrSpaceFreeKey(key)
@@ -1454,7 +1452,7 @@ class Header extends React.Component {
                               this.setState({ connectedAPIEndpointType: endpointType });
                               onConfigChange("ocrSpaceApiKey", key);
                             } else {
-                              message.error("Invalid API key");
+                              message.error("API Key 无效");
                               this.setState({ connectedAPIEndpointType: null });
                               onConfigChange("ocrSpaceApiKey", '');
                             }
@@ -1464,21 +1462,21 @@ class Header extends React.Component {
                            
                         }}
                       >
-                        Test
+                        测试
                       </Button>
                        { this.state.connectedAPIEndpointType ? (<span className="api-key-notification">
-                        API key stored. Connected to { this.state.connectedAPIEndpointType.toUpperCase() } endpoint. 
+                        API Key 已保存。当前已连接到 { this.state.connectedAPIEndpointType.toUpperCase() } 端点。
                       </span>) : null }
                     </div>
                   </div>
 
                   <div className="row">
                     <div>
-                      <span className="label-text">Default OCR language</span>
+                      <span className="label-text">默认 OCR 语言</span>
                       <Select
                         id="ss"
                         style={{ width: "150px" }}
-                        placeholder="OCR Language"
+                        placeholder="OCR 语言"
                         value={this.props.config.ocrLanguage}
                         disabled={
                           (this.props.config.ocrMode === "disabled" ||
@@ -1500,7 +1498,7 @@ class Header extends React.Component {
                     </div>
 
                     <div>
-                      You can overwrite the default OCR settings in the macro with{" "}
+                      你可以在宏中通过以下变量覆盖默认 OCR 设置：{" "}
                       <a
                         href="https://goto.ui.vision/x/idehelp?help=ocrlanguage"
                         target="_blank"
@@ -1546,13 +1544,13 @@ class Header extends React.Component {
                             });
                         }}
                       >
-                        Show OCR Overlay
+                        显示 OCR 覆盖层
                       </Button>
                     </p>
 
                     <p>
-                      The test runs OCR on the currently active browser tab and
-                      displays the result as overlay.
+                      该测试会对当前活动的浏览器标签页执行 OCR，
+                      并将结果以覆盖层形式显示。
                     </p>
                   </div>
                   <div className="row">
@@ -1616,14 +1614,14 @@ class Header extends React.Component {
                             });
                         }}
                       >
-                        Calibrate XClickTextRelative
+                        校准 XClickTextRelative
                       </Button>{" "}
                       (
                       <a
                         href="https://goto.ui.vision/x/idehelp?help=ocr-calibrate-textrelative"
                         target="_blank"
                       >
-                        What is this?
+                        这是什么？
                       </a>
                       )
                     </p>
@@ -1768,20 +1766,19 @@ class Header extends React.Component {
             },
             {
               key: 'vision',
-              label: 'Vision',
+              label: '视觉识别',
               className: 'vision-pane',
               children: (
                 <>
                   <p>
-                    Ui.Vision's eyes can look inside the web browser or search the
-                    complete desktop.
+                    AI RPA 的视觉识别可以查看浏览器内部内容，也可以搜索整个桌面。
                   </p>
                   <div className="row">
                     <Radio.Group
                       value={this.props.config.cvScope}
                     >
                       <Radio value="browser" onClick={() => onConfigChange("cvScope", "browser")}>
-                        Browser Automation (Look inside browser)
+                        浏览器自动化（识别浏览器内部）
                       </Radio>
                       <Radio
                         value="desktop"
@@ -1793,7 +1790,7 @@ class Header extends React.Component {
                           )
                         }
                       >
-                        <span>Desktop Automation (Search complete desktop)</span>
+                        <span>桌面自动化（搜索整个桌面）</span>
                         {this.state.xModuleData[getXDesktop().getName()] &&
                         this.state.xModuleData[getXDesktop().getName()]
                           .installed ? null : (
@@ -1804,7 +1801,7 @@ class Header extends React.Component {
                               marginLeft: "15px",
                             }}
                           >
-                            Install the DesktopAutomation XModule first.
+                            请先安装 DesktopAutomation XModule。
                           </a>
                         )}
 
@@ -1829,14 +1826,14 @@ class Header extends React.Component {
                             }
                           >
                             <span>
-                              Use native{" "}
+                              使用原生{" "}
                               <a
                                 href={getXScreenCapture().infoLink()}
                                 target="_blank"
                               >
-                                desktop screen capture
+                                桌面截图功能
                               </a>{" "}
-                              if installed (see XModule below)
+                              （如已安装，请见下方 XModule）
                             </span>
                             {this.state.xModuleData[getXScreenCapture().getName()] &&
                             this.state.xModuleData[getXScreenCapture().getName()]
@@ -1848,7 +1845,7 @@ class Header extends React.Component {
                                   marginLeft: "15px",
                                 }}
                               >
-                                Install the ScreenCapture XModule first.
+                                请先安装 ScreenCapture XModule。
                               </a>
                             )}
                           </Checkbox>

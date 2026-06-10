@@ -1,10 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk'
 import ComputerUse, { ComputerUseActionResult } from './computer_use'
 import { ComputerUseMessageType } from './model'
-import { ANTHROPIC } from '@/common/constant'
 
 export interface SamplingParams {
-  anthropicAPIKey: string
+  openaiApiKey: string
+  openaiBaseUrl: string
   model: string
   captureScreenShotFunction: () => Promise<ArrayBuffer>
   handleMouseAction: (action: any, scaleFactor: number) => Promise<ComputerUseActionResult>
@@ -14,58 +13,43 @@ export interface SamplingParams {
 }
 
 export class SamplingError extends Error {
-  messages: ClaudeSamplingMessage[]
-  constructor({ messages, error }: { messages: ClaudeSamplingMessage[]; error: any }) {
-    super(error)
+  messages: OpenAISamplingMessage[]
+  constructor({ messages, error }: { messages: OpenAISamplingMessage[]; error: any }) {
+    super(error?.message || String(error))
     this.messages = messages
   }
 }
 
 type ToolResult = any
-type MessageContentType = 'text' | 'tool_use'
-interface MessageContent {
-  type: MessageContentType
-  text: string
-}
-export interface ClaudeSamplingMessage {
+export interface OpenAISamplingMessage {
   role: string
-  content: MessageContent[] | ToolResult
+  content: any
+  tool_calls?: any[]
 }
 
 export interface CallAPIReturnType {
-  content: Anthropic.Beta.Messages.BetaContentBlock[]
+  content: any
   tool_use: ToolUse[]
-  tool_use_id?: string | null
 }
-
-// {action: "mouse_move", coordinate: [500, 200]}
 
 type Coordinate = [number, number]
 
 export interface ToolUse {
-  // content: Anthropic.Beta.Messages.BetaContentBlock[];
   tool_use_id: string
   action?: string
   coordinate?: Coordinate | any
   coordinates?: Coordinate | any
-}
-
-// tool use error extends error
-class ToolUseError extends Error {
-  tool_use_id: string
-  constructor({ message, tool_use_id }: { message: string; tool_use_id: string }) {
-    super(message)
-    this.tool_use_id = tool_use_id
-  }
+  type?: string
+  value?: string
 }
 
 class Sampling {
   systemPrompt: string = ''
   computer: any
-  anthropic: Anthropic | undefined
-  messages: ClaudeSamplingMessage[] = []
-
+  clientReady: boolean = false
+  messages: OpenAISamplingMessage[] = []
   loopCompletedCount = 0
+
   constructor(private params: SamplingParams) {
     this.computer = new ComputerUse({
       captureScreenShotFunction: params.captureScreenShotFunction,
@@ -74,279 +58,212 @@ class Sampling {
       logMessage: params.logMessage
     })
 
-    if (params.anthropicAPIKey) {
-      this.anthropic = new Anthropic({
-        apiKey: params.anthropicAPIKey,
-        dangerouslyAllowBrowser: true
-      })
+    if (params.openaiApiKey) {
+      this.clientReady = true
     }
   }
 
-  setAPIKey(apiKey: string) {
-    this.anthropic = new Anthropic({
-      apiKey: apiKey,
-      dangerouslyAllowBrowser: true
-    })
+  setAPIKey(apiKey: string, baseURL?: string) {
+    this.params.openaiApiKey = apiKey
+    this.params.openaiBaseUrl = baseURL || this.params.openaiBaseUrl
+    this.clientReady = true
+  }
+
+  private toolSchemas() {
+    return [
+      {
+        type: 'function',
+        function: {
+          name: 'mouse_move',
+          description: 'Move mouse to x,y',
+          parameters: {
+            type: 'object',
+            properties: { x: { type: 'number' }, y: { type: 'number' } },
+            required: ['x', 'y']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'left_click',
+          description: 'Left click at x,y',
+          parameters: {
+            type: 'object',
+            properties: { x: { type: 'number' }, y: { type: 'number' } },
+            required: ['x', 'y']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'right_click',
+          description: 'Right click at x,y',
+          parameters: {
+            type: 'object',
+            properties: { x: { type: 'number' }, y: { type: 'number' } },
+            required: ['x', 'y']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'double_click',
+          description: 'Double click at x,y',
+          parameters: {
+            type: 'object',
+            properties: { x: { type: 'number' }, y: { type: 'number' } },
+            required: ['x', 'y']
+          }
+        }
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'text',
+          description: 'Type text',
+          parameters: {
+            type: 'object',
+            properties: { value: { type: 'string' } },
+            required: ['value']
+          }
+        }
+      }
+    ]
   }
 
   async processToolUse(toolUse: CallAPIReturnType['tool_use']) {
-    try {
-      const toolResults = []
-
-      for (const action of toolUse) {
-        console.log('Processing tool action:>>', action)
-        // Ensure coordinate format is consistent
-        if (action.coordinate && Array.isArray(action.coordinate)) {
-          action.coordinates = { x: action.coordinate[0], y: action.coordinate[1] }
-          delete action.coordinate
-        }
-
-        const toolUseId = action.tool_use_id
-        // Ensure any click action has coordinates
-        if (
-          (action.action === 'left_click' || action.action === 'right_click' || action.action === 'double_click') &&
-          !action.coordinates
-        ) {
-          // throw new ToolUseError({ tool_use_id: toolUseId, message: `${action.action} action requires coordinates` })
-          toolResults.push({
-            type: 'tool_result',
-            tool_use_id: toolUseId,
-            content: [{ type: 'text', text: `${action.action} action requires coordinates` }],
-            is_error: true
-          })
-          continue
-        }
-
-        console.log('Processing tool action:', action)
-        const result = await this.computer.processAction(action)
-
-        toolResults.push({
-          type: 'tool_result',
-          tool_use_id: toolUseId,
-          content: result.success
-            ? result.base64Image
-              ? [
-                  { type: 'text', text: result.message },
-                  {
-                    type: 'image',
-                    source: {
-                      type: 'base64',
-                      media_type: 'image/png',
-                      data: result.base64Image
-                    }
-                  }
-                ]
-              : [{ type: 'text', text: result.message }]
-            : [{ type: 'text', text: result.error }],
-          is_error: !result.success
-        })
+    const toolResults = []
+    for (const action of toolUse) {
+      if (action.coordinate && Array.isArray(action.coordinate)) {
+        action.coordinates = { x: action.coordinate[0], y: action.coordinate[1] }
+        delete action.coordinate
       }
 
-      return toolResults
-    } catch (error: any) {
-      console.error('Error in processToolUse:', error)
-      return [
-        {
-          type: 'tool_result',
-          tool_use_id: error.tool_use_id,
-          content: [{ type: 'text', text: error.message }],
-          is_error: true
-        }
-      ]
+      const result = await this.computer.processAction(action)
+      toolResults.push({
+        tool_call_id: action.tool_use_id,
+        role: 'tool',
+        content: result.success ? result.message : result.error || 'Tool execution failed'
+      })
     }
+    return toolResults
   }
 
   async callAPI(params: any): Promise<CallAPIReturnType> {
-    try {
-      const { width, height } = {
-        width: window.screen.availWidth,
-        height: window.screen.availHeight
-      }
+    if (!this.clientReady) {
+      throw new Error('OpenAI client is not initialized')
+    }
 
-      // console.log('Calling API with messages:', JSON.stringify(params.messages, null, 2))
-      // const userPrompt = params.messages[0].content[0].text
-
-      // this.logMessage(userPrompt, 'user')
-
-      if (!this.anthropic) {
-        throw new Error('Anthropic is not initialized')
-      }
-
-      const response = await this.anthropic.beta.messages.create({
+    const response = await fetch(`${this.params.openaiBaseUrl.replace(/\/$/, '')}/responses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.params.openaiApiKey}`
+      },
+      body: JSON.stringify({
         model: this.params.model,
-        max_tokens: 1024,
-        tools: [
-          {
-            type: ANTHROPIC.COMPUTER_USE_TOOL_VERSION,
-            name: 'computer',
-            display_width_px: width,
-            display_height_px: height,
-            display_number: 1
-          }
-        ],
-        messages: params.messages,
-        system: params.system,
-        betas: [ANTHROPIC.COMPUTER_USE_BETA_FLAG]
+        input: params.messages
+          .filter((message: any) => message.role === 'user')
+          .map((message: any) => ({
+            role: 'user',
+            content: typeof message.content === 'string'
+              ? [{ type: 'input_text', text: message.content }]
+              : message.content
+          }))
+        // tools: this.toolSchemas(),
+        // tool_choice: 'auto'
       })
+    })
 
-      console.log('Raw API response:', JSON.stringify(response, null, 2))
+    if (!response.ok) {
+      const text = await response.text()
+      throw new Error(`${response.status} ${response.statusText}: ${text}`)
+    }
 
-      const aiResponseText = (response.content[0] as Anthropic.Beta.Messages.BetaTextBlock)?.text
-      if (aiResponseText) {
-        this.params.logMessage(aiResponseText, 'ai')
-      }
+    const json = await response.json()
+    const output = json.output || []
+    const aiResponseText = output
+      .flatMap((item: any) => item.content || [])
+      .filter((item: any) => item.type === 'output_text')
+      .map((item: any) => item.text || '')
+      .join('\n')
+    if (aiResponseText) {
+      this.params.logMessage(aiResponseText, 'ai')
+    }
 
-      const coordinate = ((response.content[1] as Anthropic.Beta.Messages.BetaToolUseBlock)?.input as any)?.coordinate
-      const coordinateText = coordinate ? ` ${coordinate[0]}, ${coordinate[1]}` : ''
-      const aiToolUseInputAction = ((response.content[1] as Anthropic.Beta.Messages.BetaToolUseBlock)?.input as any)?.action
-      if (aiToolUseInputAction) {
-        const message = aiToolUseInputAction + coordinateText
-        this.params.logMessage(message, 'ai', 'action')
-        this.params.logMessage(message, 'status')
-      }
+    const toolCalls = output
+      .flatMap((item: any) => item.content || [])
+      .filter((item: any) => item.type === 'tool_call')
 
-      const toolUse = []
-      let toolUseId = null
-
-      for (const content of response.content) {
-        if (content.type === 'tool_use') {
-          console.log('Found tool_use:', content)
-          toolUseId = content.id
-          if (content.input) {
-            const toolUseObj: ToolUse = { ...content.input, tool_use_id: content.id }
-            toolUse.push(toolUseObj)
-          }
+    const toolUse = toolCalls.map((call: any) => {
+      const args = typeof call.arguments === 'string' ? JSON.parse(call.arguments || '{}') : (call.arguments || {})
+      if (typeof args.x === 'number' && typeof args.y === 'number') {
+        return {
+          tool_use_id: call.id,
+          action: call.function.name,
+          coordinate: [args.x, args.y]
         }
       }
-
-      console.log('Extracted tool use:', toolUse)
-
       return {
-        content: response.content,
-        tool_use: toolUse
-        // tool_use_id: toolUseId
+        tool_use_id: call.id,
+        action: call.function.name,
+        value: args.value,
+        type: call.function.name
       }
-    } catch (error) {
-      console.error('API call failed. Error:', error)
-      throw error
+    })
+
+    if (toolUse[0]?.action) {
+      const action = toolUse[0]
+      const coordinateText = action.coordinate ? ` ${action.coordinate[0]}, ${action.coordinate[1]}` : ''
+      const text = `${action.action}${coordinateText}`
+      this.params.logMessage(text, 'ai', 'action')
+      this.params.logMessage(text, 'status')
+    }
+
+    return {
+      content: { content: aiResponseText, tool_calls: toolCalls },
+      tool_use: toolUse
     }
   }
 
-  async run(userMessage: string, messages: ClaudeSamplingMessage[] | null = null): Promise<any> {
+  async run(userMessage: string, messages: OpenAISamplingMessage[] | null = null): Promise<any> {
     if (!userMessage) {
       throw new Error('Prompt is required')
     }
 
-    if (messages) {
-      this.messages = messages
-    } else {
-      this.messages = []
-    }
-
+    this.messages = messages || []
     this.systemPrompt = userMessage
     return this._run(userMessage)
   }
 
   private async _run(userMessage: string): Promise<any> {
     try {
-      const shallStop = (currentLoopCount: number): { messages: any[]; stopReason: string } | boolean => {
-        const stopReason = this.params.getTerminationRequest(currentLoopCount)
-        if (stopReason) {
-          if (stopReason === 'max_loop_reached') {
-            console.log('max_loop_reached:>> ', this.messages)
-            return { messages: this.messages, stopReason: stopReason }
-          } else if (stopReason === 'player_stopped') {
-            console.log('player_stopped:>> ', this.messages)
-            return { messages: this.messages, stopReason: stopReason }
-          }
-          return { messages: this.messages, stopReason: stopReason }
-        }
-        return false
+      const stopReason = this.params.getTerminationRequest(this.loopCompletedCount)
+      if (stopReason) {
+        return { messages: this.messages, stopReason }
       }
 
-      console.log('run this.messages:>> ', this.messages)
-      // this.logMessage(`Calling Anthropic API with user message: ${userMessage}`)
-
-      if (shallStop(this.loopCompletedCount)) {
-        return this.messages
-      }
-
-      // Add user message
-      this.messages.push({
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: userMessage
-          }
-        ]
-      })
-
+      this.messages.push({ role: 'user', content: userMessage })
       this.params.logMessage('Calling API', 'status')
 
-      let response: CallAPIReturnType
-      try {
-        response = await this.callAPI({
-          model: this.params.model,
-          messages: this.messages,
-          system: this.systemPrompt
-        })
-      } catch (error) {
-        this.params.logMessage('API call failed.', 'status')
-        // this.params.logMessage('', 'status')
-        console.log('Error in run:>> ', error)
-        throw error
-      }
-
-      console.log('_run:>> response: ', response)
-
+      const response = await this.callAPI({ messages: this.messages, system: this.systemPrompt })
       this.params.logMessage('API call complete', 'status')
 
-      if (!response) {
-        return this.messages
-      }
-
-      // Add assistant's response with tool_use blocks
-      this.messages.push({
-        role: 'assistant',
-        content: response.content
-      })
-
+      this.messages.push({ role: 'assistant', content: response.content.content || '' })
       this.loopCompletedCount++
 
-      // Process tool use if present
       if (response.tool_use && response.tool_use.length > 0) {
-        // this.params.logMessage(response.tool_use[0]?.action, 'status')
-
-        const toolResult = (await this.processToolUse(response.tool_use)) as ToolResult
-
-        console.log('response:>> ', response)
-        console.log('Tool result:>> ', toolResult)
-
-        // Add tool results
-        this.messages.push({
-          role: 'user',
-          content: toolResult
-        })
-
-        // Check for task completion in the API's response
-        const completionIndicator = response.content.find(
-          (content: any) => content.type === 'text' && content.text.toLowerCase().includes('task completed')
-        )
-
-        if (completionIndicator) {
-          console.log('=== Task completed as indicated by the API ===\n task completion messages:>> ', this.messages)
-          return this.messages
-        }
-
-        // Continue with the task
+        const toolResult = await this.processToolUse(response.tool_use)
+        this.messages.push(...toolResult)
         return this._run('Continue with the task...')
       }
 
       return this.messages
     } catch (error) {
-      console.error('Error in run:', error)
-      throw new SamplingError({ messages: this.messages, error: error })
+      throw new SamplingError({ messages: this.messages, error })
     }
   }
 }

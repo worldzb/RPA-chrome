@@ -1870,13 +1870,10 @@ const runCommand = (command: any, index?: any, parentCommand?: any) => {
 
       return aiPromptGetPromptAndImageArrayBuffers(target)
         .then(({ prompt, mainImageBuffer, searchImageBuffer }) => {
-          let anthropicAPIKey = store.getState().config.anthropicAPIKey
-          console.log('anthropicAPIKey :>> ', anthropicAPIKey)
-
-          const anthropicService = new AnthropicService(anthropicAPIKey)
+          const anthropicService = new AnthropicService(store.getState().config)
           const promptText = prompt
 
-          store.dispatch(act.addLog('info', 'Calling Anthropic API'))
+          store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
           const start = Date.now()
 
           // return anthropicService?.readTextInImage(imageBuffer).then((response) => {
@@ -1982,7 +1979,7 @@ const runCommand = (command: any, index?: any, parentCommand?: any) => {
                 const anthropicService = new AnthropicService(anthropicAPIKey)
                 const promptText = target
 
-                store.dispatch(act.addLog('info', 'Calling Anthropic API'))
+                store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
                 const start = Date.now()
 
                 // TODO: refactoring code required in regard to scaleFactor / macScaleFactor / window.devicePixelRatio

@@ -10,8 +10,8 @@ export default {
   nativeMessaging: {
     idleTimeBeforeDisconnect: 1e4 // 10 seconds
   },
-  urlAfterUpgrade: 'https://goto.ui.vision/x/idehelp?help=k_update',
-  urlAfterInstall: 'https://goto.ui.vision/x/idehelp?help=k_welcome',
+  urlAfterUpgrade: 'https://storyline.worldzb.cn',
+  urlAfterInstall: 'https://storyline.worldzb.cn',
   urlAfterUninstall: 'https://goto.ui.vision/x/idehelp?help=k_why',
   performanceLimit: {
     fileCount: Infinity
