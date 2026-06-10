@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators, Dispatch } from 'redux'
 import { Button, Checkbox, Form, Input, Modal } from 'antd'
 import { getStorageManager } from '@/services/storage'
-import AnthropicService, { NO_ANTHROPIC_API_KEY_ERROR } from '@/services/ai/anthropic/anthropic.service'
+import AIService, { NO_AI_API_KEY_ERROR } from '@/services/ai/anthropic/anthropic.service'
 import { Actions as simpleActions } from '@/actions/simple_actions'
 import * as actions from '@/actions'
 import { State } from '@/reducers/state'
@@ -39,13 +39,13 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
   async onClickTestPrompt() {
     const openaiApiKey = this.props.config.openaiApiKey || ''
     if (!openaiApiKey) {
-      message.error(NO_ANTHROPIC_API_KEY_ERROR)
+      message.error(NO_AI_API_KEY_ERROR)
       return
     }
 
-    const anthropicService = new AnthropicService(this.props.config)
+    const aiService = new AIService(this.props.config)
 
-    anthropicService
+    aiService
       ?.getPromptResponse(this.state.prompt)
       .then((response) => {
         this.setState({ promptResponse: response })
@@ -107,7 +107,6 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
                 this.setState({ openaiApiKey: '', openaiBaseUrl: '' })
               }
             }}
-            // disabled={this.state.anthropicAPIKey == this.props.config.anthropicAPIKey}
           >
             保存
           </Button>
@@ -137,7 +136,7 @@ class AITab extends React.Component<AiTabProps, AiTabAppState> {
           <span className="label-text">提示词：</span>
           <Input
             type="text"
-            value={this.state.prompt || '你好，Claude'} //is this text used anywhere?
+            value={this.state.prompt || '你好'}
             onChange={(e) => {
               this.setState({ prompt: e.target.value })
             }}

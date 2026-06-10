@@ -22,9 +22,9 @@ type ProcessImageResult = {
   aiResponse: string
 }
 
-export { NO_OPENAI_API_KEY_ERROR as NO_ANTHROPIC_API_KEY_ERROR }
+export { NO_OPENAI_API_KEY_ERROR as NO_AI_API_KEY_ERROR }
 
-class AnthropicService {
+class AIService {
   private apiKey: string
   private baseURL: string
   private model: string
@@ -290,4 +290,4 @@ class AnthropicService {
   }
 }
 
-export default AnthropicService
+export default AIService

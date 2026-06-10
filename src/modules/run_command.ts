@@ -52,7 +52,7 @@ import { runCommandInPlayTab } from '@/ext/popup/run_command'
 import { clearTimerForTimeoutStatus, startSendingTimeoutStatus } from '@/ext/popup/timeout_counter'
 import { findMacroNodeWithCaseInsensitiveRelativePath } from '@/recomputed'
 import { getScreenshotInSearchArea, saveDataUrlToLastDesktopScreenshot, saveDataUrlToLastScreenshot, searchVision } from '@/search_vision'
-import AnthropicService from '@/services/ai/anthropic/anthropic.service'
+import AIService from '@/services/ai/anthropic/anthropic.service'
 // import { runComputerUseService } from '@/services/ai/computer_use/computer_use.service'
 import { getNativeCVAPI } from '@/services/desktop'
 import { getNativeFileSystemAPI } from '@/services/filesystem'
@@ -1870,14 +1870,14 @@ const runCommand = (command: any, index?: any, parentCommand?: any) => {
 
       return aiPromptGetPromptAndImageArrayBuffers(target)
         .then(({ prompt, mainImageBuffer, searchImageBuffer }) => {
-          const anthropicService = new AnthropicService(store.getState().config)
+          const aiService = new AIService(store.getState().config)
           const promptText = prompt
 
           store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
           const start = Date.now()
 
           // return anthropicService?.readTextInImage(imageBuffer).then((response) => {
-          return anthropicService
+          return aiService
             ?.aiPromptProcessImage(mainImageBuffer, searchImageBuffer, promptText)
             .then(({ coords, isSinglePoint, aiResponse }) => {
               const end = Date.now()
@@ -1973,17 +1973,14 @@ const runCommand = (command: any, index?: any, parentCommand?: any) => {
 
             return getFileBufferFromScreenshotStorage(screenshotFileName)
               .then((imageBuffer) => {
-                let anthropicAPIKey = store.getState().config.anthropicAPIKey
-                console.log('anthropicAPIKey :>> ', anthropicAPIKey)
-
-                const anthropicService = new AnthropicService(anthropicAPIKey)
+                const aiService = new AnthropicService(store.getState().config)
                 const promptText = target
 
                 store.dispatch(act.addLog('info', 'Calling OpenAI-compatible API'))
                 const start = Date.now()
 
                 // TODO: refactoring code required in regard to scaleFactor / macScaleFactor / window.devicePixelRatio
-                return anthropicService
+                return aiService
                   ?.aiScreenXYProcessImage(imageBuffer, promptText)
                   .then(({ coords, aiResponse }) => {
                     const end = Date.now()

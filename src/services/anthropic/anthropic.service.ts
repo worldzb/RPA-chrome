@@ -1,1 +1,1 @@
-export { default, NO_ANTHROPIC_API_KEY_ERROR } from '@/services/ai/anthropic/anthropic.service'
+export { default, NO_AI_API_KEY_ERROR } from '@/services/ai/anthropic/anthropic.service'

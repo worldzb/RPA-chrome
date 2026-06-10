@@ -165,14 +165,16 @@ class Sampling {
       },
       body: JSON.stringify({
         model: this.params.model,
-        input: params.messages
-          .filter((message: any) => message.role === 'user')
-          .map((message: any) => ({
+        input: (() => {
+          const latestUserMessage = [...params.messages].reverse().find((message: any) => message.role === 'user')
+          if (!latestUserMessage) return []
+          return [{
             role: 'user',
-            content: typeof message.content === 'string'
-              ? [{ type: 'input_text', text: message.content }]
-              : message.content
-          }))
+            content: typeof latestUserMessage.content === 'string'
+              ? [{ type: 'input_text', text: latestUserMessage.content }]
+              : latestUserMessage.content
+          }]
+        })(),
         // tools: this.toolSchemas(),
         // tool_choice: 'auto'
       })

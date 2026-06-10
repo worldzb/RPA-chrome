@@ -3,7 +3,7 @@ import * as C from '@/common/constant'
 import { Player } from '@/common/player'
 import { compose, isWindows } from '@/common/ts_utils'
 import { store } from '@/redux'
-import { NO_ANTHROPIC_API_KEY_ERROR } from '../anthropic'
+import { NO_AI_API_KEY_ERROR } from '../anthropic'
 import { getOpenAIConfig } from '@/common/ai_config'
 import Sampling, { OpenAISamplingMessage, SamplingError, SamplingParams } from './sampling'
 import { ComputerUseMessageType } from './model'
@@ -20,7 +20,7 @@ interface ComputerUseServiceParams {
 const uivError = (error: any) => {
   if (error instanceof Error) {
     if (error.message.includes('Expected either apiKey or authToken to be set')) {
-      return new Error(NO_ANTHROPIC_API_KEY_ERROR)
+      return new Error(NO_AI_API_KEY_ERROR)
     } else if (error.message.includes('invalid x-api-key')) {
       return new Error('Invalid API key. Please re-enter the API key, and save it.')
     }
@@ -248,7 +248,7 @@ export class ComputerUseService {
       const aiConfig = getOpenAIConfig(store.getState().config)
 
       if (!aiConfig.apiKey) {
-        throw new Error(NO_ANTHROPIC_API_KEY_ERROR)
+        throw new Error(NO_AI_API_KEY_ERROR)
       }
 
       this._logMessage('Computer Use sequence start:')
