@@ -34,21 +34,31 @@ class AIService {
   MAX_PIXELS = 1191888
 
   constructor(configOrApiKey: string | Record<string, any>, maybeBaseURL?: string, maybeModel?: string) {
-    const config = typeof configOrApiKey === 'string'
-      ? {
-          apiKey: configOrApiKey,
-          baseURL: maybeBaseURL || 'https://api.openai.com/v1',
-          model: maybeModel || 'gpt-5.5'
-        }
-      : getOpenAIConfig(configOrApiKey)
+    if (typeof configOrApiKey === 'string') {
+      const config = {
+        apiKey: configOrApiKey,
+        baseURL: maybeBaseURL || 'https://api.openai.com/v1',
+        model: maybeModel || 'gpt-5.5'
+      }
 
-    if (!config.apiKey) {
+      if (!config.apiKey) {
+        throw new Error(NO_OPENAI_API_KEY_ERROR)
+      }
+
+      this.apiKey = config.apiKey
+      this.baseURL = config.baseURL.replace(/\/$/, '')
+      this.model = config.model
+      return
+    }
+
+    const safeConfig = configOrApiKey || {}
+    if (!safeConfig.openaiApiKey) {
       throw new Error(NO_OPENAI_API_KEY_ERROR)
     }
 
-    this.apiKey = config.apiKey
-    this.baseURL = config.baseURL.replace(/\/$/, '')
-    this.model = config.model
+    this.apiKey = safeConfig.openaiApiKey
+    this.baseURL = (safeConfig.openaiBaseUrl || 'https://api.openai.com/v1').replace(/\/$/, '')
+    this.model = safeConfig.openaiModel || 'gpt-5.5'
   }
 
   uivError = (error: any) => {

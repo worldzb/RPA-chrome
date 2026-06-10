@@ -112,6 +112,7 @@ module.exports = {
       crypto: false,
       child_process: false,
       readline: false,
+      worker_threads: false,
       'stream/promises': false,
       'process/browser': require.resolve('process/browser')
     }

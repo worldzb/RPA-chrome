@@ -18,15 +18,17 @@ interface ComputerUseServiceParams {
 }
 
 const uivError = (error: any) => {
-  if (error instanceof Error) {
-    if (error.message.includes('Expected either apiKey or authToken to be set')) {
-      return new Error(NO_AI_API_KEY_ERROR)
-    } else if (error.message.includes('invalid x-api-key')) {
-      return new Error('Invalid API key. Please re-enter the API key, and save it.')
-    }
-    return new Error(`E352: OpenAI-compatible API returned error: ${error.message}`)
+  const message = error instanceof Error
+    ? error.message
+    : error?.message || String(error || 'Unknown error')
+
+  if (/Expected either apiKey or authToken to be set/.test(message)) {
+    return new Error(NO_AI_API_KEY_ERROR)
   }
-  return new Error(`E352: OpenAI-compatible API returned error: ${error.message}`)
+  if (/invalid x-api-key/.test(message)) {
+    return new Error('Invalid API key. Please re-enter the API key, and save it.')
+  }
+  return new Error(`E352: OpenAI-compatible API returned error: ${message}`)
 }
 
 export class ComputerUseService {
@@ -39,7 +41,9 @@ export class ComputerUseService {
   constructor(private params: ComputerUseServiceParams) {
     this._logMessage = params.logMessage || this.panelLogMessage
     this._getTerminationRequest = params.getTerminationRequest || this.getTerminationRequestDefault
-    this.sampling = this.getSampling()
+    this.getSampling().then((sampling) => {
+      this.sampling = sampling
+    })
   }
 
   private _runCsFreeCommand = (command: any) => {
@@ -70,8 +74,8 @@ export class ComputerUseService {
     }
   }
 
-  private createNewSampling = () => {
-    const aiConfig = getOpenAIConfig(store.getState().config)
+  private createNewSampling = async () => {
+    const aiConfig = await getOpenAIConfig(store.getState().config)
     const samplingProps: SamplingParams = {
       model: aiConfig.model,
       openaiApiKey: aiConfig.apiKey,
@@ -87,16 +91,15 @@ export class ComputerUseService {
     this.sampling = new Sampling(samplingProps)
   }
 
-  private getSampling = (): Sampling => {
+  private getSampling = async (): Promise<Sampling> => {
     if (!this.sampling) {
-      this.createNewSampling()
+      await this.createNewSampling()
     }
     return this.sampling
   }
 
-  createNewChat = () => {
-    // TODO: make it work
-    this.createNewSampling()
+  createNewChat = async () => {
+    await this.createNewSampling()
   }
 
   handleMouseAction = async (action: any, scaleFactor: number) => {
@@ -245,7 +248,7 @@ export class ComputerUseService {
 
   run = async (promptText: string, value: string, vars: any) => {
     try {
-      const aiConfig = getOpenAIConfig(store.getState().config)
+      const aiConfig = await getOpenAIConfig(store.getState().config)
 
       if (!aiConfig.apiKey) {
         throw new Error(NO_AI_API_KEY_ERROR)
@@ -256,9 +259,10 @@ export class ComputerUseService {
 
       console.log('Running sampling...')
 
-      this.sampling.setAPIKey(aiConfig.apiKey, aiConfig.baseURL)
+      const sampling = await this.getSampling()
+      sampling.setAPIKey(aiConfig.apiKey, aiConfig.baseURL)
 
-      return this.sampling
+      return sampling
         .run(promptText, this.messages)
         .then((result) => {
           // remove data from result

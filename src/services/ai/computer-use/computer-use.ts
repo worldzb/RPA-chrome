@@ -120,7 +120,7 @@ class ComputerUse {
       originalWidth: metadata.width,
       originalHeight: metadata.height
     }
-  } 
+  }
 
   async processAction(action: any) {
     console.log('Processing action:', action)
